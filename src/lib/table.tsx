@@ -9,7 +9,6 @@ import TableCell, {
 import SelectOverlay from "./components/select-overlay/select-overlay";
 import { Cell, TableColumn } from "./models";
 import styles from "./table.module.scss";
-import useCalenderFunctions from "./components/hooks/use-calender-functionality-hook";
 import DatePicker from "./components/toolbar/date-picker/date-picker";
 import Navigation from "./components/toolbar/navigation/navigation";
 

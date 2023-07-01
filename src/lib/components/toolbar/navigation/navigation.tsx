@@ -1,4 +1,3 @@
-import moment from "moment";
 import styles from "./navigation.module.scss";
 import { GrFormNext } from "react-icons/gr";
 
