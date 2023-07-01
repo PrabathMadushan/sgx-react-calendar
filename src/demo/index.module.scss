@@ -1,0 +1,16 @@
+.page {
+  h1 {
+    margin: 0;
+    padding: 10px;
+  }
+  background-color: rgb(43, 95, 236);
+  height: 100vh;
+  .container {
+    margin: auto;
+    width: (150 * 8)+30px;
+    height: 800px;
+    overflow-y: scroll;
+    box-shadow: 0 30px 40px 0 rgba(16, 36, 94, .2);
+    background:linear-gradient(130deg#3c91e7 0,#78378c 100%);
+  }
+}

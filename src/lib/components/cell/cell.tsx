@@ -13,8 +13,8 @@ interface CellProps {
   mode: "Edit" | "View";
 }
 
-export const DEFAULT_CELL_WIDTH = 120;
-export const DEFAULT_CELL_HEIGHT = 50;
+export const DEFAULT_CELL_WIDTH = 150;
+export const DEFAULT_CELL_HEIGHT = 60;
 
 const TableCell = (props: CellProps) => {
   return (
@@ -22,14 +22,18 @@ const TableCell = (props: CellProps) => {
       className={`${styles.cell} ${
         props.type === "header" ? styles.headerCell : ""
       }`}
-      onMouseDown={() => {
-        if (props.mode === "Edit" && props.type === "text")
-          props.onMouseDown({
-            column: props.column,
-            row: props.row,
-            value: props.value,
-            header: false,
-          });
+      onMouseDown={(e) => {
+        if (props.mode === "Edit" && props.type === "text") {
+          const isCtrPressed = e.ctrlKey;
+          if (!isCtrPressed) {
+            props.onMouseDown({
+              column: props.column,
+              row: props.row,
+              value: props.value,
+              header: false,
+            });
+          }
+        }
       }}
       onMouseUp={() => {
         if (props.mode === "Edit" && props.type === "text")
@@ -55,7 +59,6 @@ const TableCell = (props: CellProps) => {
         height: `${DEFAULT_CELL_HEIGHT}px`,
         top: `${DEFAULT_CELL_HEIGHT * props.row}px`,
         left: `${DEFAULT_CELL_WIDTH * props.column}px`,
-        cursor: `${props.isDragging ? "grabbing" : "grab"}`,
       }}
     >
       {/* <input value={value} onChange={(e) => setValue(e.target.value)} /> */}

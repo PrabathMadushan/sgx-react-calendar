@@ -16,7 +16,7 @@
   font-weight: bold;
   .move {
     pointer-events: all;
-    font-size: 26px;
+    font-size: 18px;
     cursor: move;
   }
   .btnClose {
@@ -31,7 +31,7 @@
     right: -8px;
     top: -8px;
     border-radius: 50%;
-    z-index: 5000;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -14,6 +14,7 @@ interface SelectOverlayProps {
   height: number;
   color: string;
   removing: boolean;
+  creating: boolean;
   mode: "Edit" | "View";
   onMoveClick: (overlayId: string) => void;
   onDelete: (overlayId: string, columnIndex: number) => void;
@@ -62,7 +63,7 @@ const SelectOverlay = (props: SelectOverlayProps) => {
           }}
         ></div>
       )}
-      {props.mode === "Edit" && (
+      {props.mode === "Edit" && !props.creating && (
         <div
           className={styles.move}
           onMouseDown={() => {
@@ -78,8 +79,8 @@ const SelectOverlay = (props: SelectOverlayProps) => {
         }}
         style={{
           position: "absolute",
-          top: "10px",
-          left: "10px",
+          top: "2px",
+          left: "5px",
           pointerEvents: "none",
           userSelect: "none",
         }}
@@ -94,16 +95,14 @@ const SelectOverlay = (props: SelectOverlayProps) => {
           .utc()
           .startOf("day")
           .add(
-            (props.height / DEFAULT_CELL_HEIGHT +
-              props.top / DEFAULT_CELL_HEIGHT -
-              2) *
+            (props.height / DEFAULT_CELL_HEIGHT -
+              1 +
+              props.top / DEFAULT_CELL_HEIGHT) *
               INTERVAL,
             "minutes"
           )
           .format("HH:mm")}
       </div>
-
-      <div></div>
     </div>
   );
 };

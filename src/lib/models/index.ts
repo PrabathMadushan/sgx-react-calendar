@@ -1,9 +1,9 @@
 // export interface SGXTable {}
 
-export interface TableColumn {
+export interface TableColumn<D> {
   id: string;
-  title: string;
-  timeSlots: TableCellValue[];
+  date:Date;
+  timeSlots: TableCellValue<D>[];
 }
 
 export interface TableRow {
@@ -18,11 +18,14 @@ export interface Cell {
   header: boolean;
 }
 
-export interface TableData {
-  columns: TableColumn[];
+export interface TableData<D> {
+  columns: TableColumn<D>[];
 }
 
-export interface TableCellValue {
+export interface TableCellValue<D> {
   from: number;
   to: number;
+  title:string;
+  description:string;
+  data:D
 }
