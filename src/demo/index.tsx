@@ -1,3 +1,5 @@
+import DatePicker from "../lib/components/toolbar/date-picker/date-picker";
+import Navigation from "../lib/components/toolbar/navigation/navigation";
 import AppTable from "../lib/table";
 import styles from "./index.module.scss";
 
@@ -6,6 +8,10 @@ const Demo = () => {
     <div className={styles.page}>
       <div>
         <h1>React Calendar View</h1>
+      </div>
+      <div className={styles.toolbar}>
+        <DatePicker />
+        <Navigation />
       </div>
       <div className={styles.container}>
         <AppTable
