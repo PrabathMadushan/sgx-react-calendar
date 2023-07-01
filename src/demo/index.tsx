@@ -4,15 +4,15 @@ import AppTable from "../lib/table";
 import styles from "./index.module.scss";
 
 const Demo = () => {
+
+  
+
   return (
     <div className={styles.page}>
       <div>
         <h1>React Calendar View</h1>
       </div>
-      <div className={styles.toolbar}>
-        <DatePicker />
-        <Navigation />
-      </div>
+      
       <div className={styles.container}>
         <AppTable
           data={[

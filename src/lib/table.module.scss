@@ -1,4 +1,7 @@
 .appTableContainer {
+  height: 750px;
+  overflow-y: scroll;
+ 
   .table {
     width: 100%;
     background-color: #fdfdfd;
@@ -21,4 +24,14 @@
     background-color: rgb(187, 187, 187);
     border-radius: 20px;
   }
+}
+.toolbar{
+  display: flex;
+  width: (150 * 8)+30px;
+  margin: auto;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  padding-left: 10px;
+  background-color: white;
+
 }

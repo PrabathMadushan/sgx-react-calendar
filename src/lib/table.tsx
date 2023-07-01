@@ -10,6 +10,8 @@ import SelectOverlay from "./components/select-overlay/select-overlay";
 import { Cell, TableColumn } from "./models";
 import styles from "./table.module.scss";
 import useCalenderFunctions from "./components/hooks/use-calender-functionality-hook";
+import DatePicker from "./components/toolbar/date-picker/date-picker";
+import Navigation from "./components/toolbar/navigation/navigation";
 
 interface ITableData<D> {
   data: TableColumn<D>[];
@@ -57,7 +59,23 @@ const AppTable = (props: ITableData<any>) => {
   const [overlays, setOverlays] = useState<OverlayCol[]>([]);
   const [activeOverlayId, setActiveOverlayId] = useState("");
   const [startingOverlay, setStartingOverlay] = useState<OverlayPosition>();
-  const {dates} = useCalenderFunctions();
+  const [week, setWeek] = useState<Date[]>([]);
+  const [weekNumber, setWeekNumber] = useState(0);
+  // const { dates } = useCalenderFunctions();
+
+  useEffect(() => {
+    let currentDate = moment();
+    let weekStart = currentDate.clone().startOf("isoWeek");
+    var days: Date[] = [];
+    for (var i = 0; i <= 6; i++) {
+      days.push(
+        moment(weekStart).subtract(weekNumber, "weeks").add(i, "days").toDate()
+      );
+    }
+    setWeek(days);
+    console.log(days);
+  }, [weekNumber]);
+
   const [currentAction, setCurrentAction] = useState<
     | "CREATING"
     | "MOVING"
@@ -77,13 +95,20 @@ const AppTable = (props: ITableData<any>) => {
     const cells: Cell[] = [];
     const overlayCols: OverlayCol[] = [];
     const maxRowCount = TOTAL_MINUTES_FOR_DAY / INTERVAL;
-    const maxColCount = props.data.length;
+    const maxColCount = 7;
+
     for (let cIndex = 0; cIndex < maxColCount; cIndex++) {
+      // const [date] = props.data.filter(
+      //   (d) => d.date.toDateString() === week[cIndex].toDateString()
+      // );
+      // if(date){
+
+      // }
       cells.push({
         value: (
           <>
-            {moment(columns[cIndex].date).format("DD")} <br />
-            {moment(columns[cIndex].date).format("ddd")}
+            {moment(week[cIndex]).format("DD")} <br />
+            {moment(week[cIndex]).format("ddd")}
           </>
         ),
         column: cIndex + 1,
@@ -155,7 +180,7 @@ const AppTable = (props: ITableData<any>) => {
     }
     setCells(cells);
     setOverlays(overlayCols);
-  }, [props.data]);
+  }, [props.data, week]);
 
   const updateCurrentOverlay = (
     callback: (overlay: OverlayPosition) => OverlayPosition,
@@ -401,6 +426,15 @@ const AppTable = (props: ITableData<any>) => {
 
   return (
     <div>
+      <div>
+        <div className={styles.toolbar}>
+          <DatePicker />
+          <Navigation
+            next={() => setWeekNumber((ps) => ps - 1)}
+            previous={() => setWeekNumber((ps) => ps + 1)}
+          />
+        </div>
+      </div>
       <div
         className={styles.appTableContainer}
         onMouseUp={() => {
