@@ -36,7 +36,7 @@ const SelectOverlay = (props: SelectOverlayProps) => {
         opacity: props.removing ? 0 : 1,
       }}
     >
-      {props.mode === "Edit" && (
+      {/* {props.mode === "Edit" && (
         <div
           className={`${styles.btnClose} ${props.color}b`}
           onClick={() => {
@@ -46,8 +46,8 @@ const SelectOverlay = (props: SelectOverlayProps) => {
         >
           <RiCloseFill />
         </div>
-      )}
-      {props.mode === "Edit" && (
+      )} */}
+      {/* {props.mode === "Edit" && (
         <div
           className={`${styles.resizeTop} ${props.color}b`}
           onMouseDown={() => {
@@ -72,7 +72,7 @@ const SelectOverlay = (props: SelectOverlayProps) => {
         >
           <BsArrowsMove />
         </div>
-      )}
+      )} */}
       <div
         onDragStart={() => {
           return false;
@@ -85,7 +85,7 @@ const SelectOverlay = (props: SelectOverlayProps) => {
           userSelect: "none",
         }}
       >
-        {moment
+        {/* {moment
           .utc()
           .startOf("day")
           .add((props.top / DEFAULT_CELL_HEIGHT - 1) * INTERVAL, "minutes")
@@ -101,7 +101,8 @@ const SelectOverlay = (props: SelectOverlayProps) => {
               INTERVAL,
             "minutes"
           )
-          .format("HH:mm")}
+          .format("HH:mm")} */}
+          this is title
       </div>
     </div>
   );

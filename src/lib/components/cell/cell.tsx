@@ -31,6 +31,7 @@ const TableCell = (props: CellProps) => {
               row: props.row,
               value: props.value,
               header: false,
+              date: new Date(),
             });
           }
         }
@@ -42,6 +43,7 @@ const TableCell = (props: CellProps) => {
             row: props.row,
             value: props.value,
             header: false,
+            date: new Date(),
           });
       }}
       onMouseMove={() => {
@@ -51,6 +53,7 @@ const TableCell = (props: CellProps) => {
             row: props.row,
             value: props.value,
             header: false,
+            date: new Date(),
           });
       }}
       onDragStart={() => false}

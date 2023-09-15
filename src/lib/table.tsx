@@ -24,6 +24,8 @@ interface OverlayCol {
   color: string;
   title: string;
   overlayPositions: OverlayPosition[];
+  weekNo: number;
+  date: Date;
 }
 
 interface OverlayPosition {
@@ -72,8 +74,24 @@ const AppTable = (props: ITableData<any>) => {
       );
     }
     setWeek(days);
-    console.log(days);
   }, [weekNumber]);
+
+  const updateO = () => {
+    const o = overlays.map((o) => {
+      o.overlayPositions.sort((a, b) => b.top - a.top);
+      console.log(o.overlayPositions.length)
+      if (
+       o.overlayPositions.length>=2 && o.overlayPositions[0].top + o.overlayPositions[0].height >
+        o.overlayPositions[1].top
+      ) {
+        o.overlayPositions[0].left = o.overlayPositions[0].left + 10;
+        o.overlayPositions[0].width = o.overlayPositions[0].width - 10;
+      }
+      return { ...o };
+    });
+
+    setOverlays(o)
+  };
 
   const [currentAction, setCurrentAction] = useState<
     | "CREATING"
@@ -97,12 +115,6 @@ const AppTable = (props: ITableData<any>) => {
     const maxColCount = 7;
 
     for (let cIndex = 0; cIndex < maxColCount; cIndex++) {
-      // const [date] = props.data.filter(
-      //   (d) => d.date.toDateString() === week[cIndex].toDateString()
-      // );
-      // if(date){
-
-      // }
       cells.push({
         value: (
           <>
@@ -112,6 +124,7 @@ const AppTable = (props: ITableData<any>) => {
         ),
         column: cIndex + 1,
         header: true,
+        date: week[cIndex],
         row: 0,
       });
 
@@ -121,6 +134,10 @@ const AppTable = (props: ITableData<any>) => {
         color: oColor,
         title: moment(props.data[cIndex].date).format("dddd"),
         columnIndex: cIndex + 1,
+        date: props.data[cIndex].date,
+        weekNo: Math.round(
+          moment().clone().startOf("isoWeek").diff(week[cIndex], "weeks")
+        ),
         overlayPositions: columns[cIndex].timeSlots.map((r) => {
           return {
             id: uuid(),
@@ -134,6 +151,7 @@ const AppTable = (props: ITableData<any>) => {
               row: r.from,
               value: <></>,
               header: false,
+              date: props.data[cIndex].date,
             },
             color: oColor,
           };
@@ -154,11 +172,13 @@ const AppTable = (props: ITableData<any>) => {
             ),
             column: cIndex,
             header: false,
+            date: props.data[cIndex].date,
             row: rowIndex + 1,
           });
           if (rowIndex === 0) {
             cells.push({
               header: false,
+              date: props.data[cIndex].date,
               value: (
                 <>
                   <FiClock style={{ fontSize: 22, color: "#6F757E" }} />
@@ -173,6 +193,7 @@ const AppTable = (props: ITableData<any>) => {
           header: false,
           value: <></>,
           column: cIndex + 1,
+          date: props.data[cIndex].date,
           row: rowIndex + 1,
         });
       }
@@ -272,6 +293,7 @@ const AppTable = (props: ITableData<any>) => {
       };
     });
     props.onChange(x);
+    updateO();
   };
 
   const validateMoveTop = (o: OverlayPosition, newTop: number) => {
@@ -422,6 +444,10 @@ const AppTable = (props: ITableData<any>) => {
         return "default";
     }
   }, [currentAction]);
+
+  const getTodayLocation = () => {
+    
+  }
 
   return (
     <div>
@@ -625,7 +651,6 @@ const AppTable = (props: ITableData<any>) => {
                 }
               }}
               onMouseUp={(cell) => {
-                console.log("Up");
                 setCurrentAction("CREATING");
                 if (currentAction === "CREATING") {
                   updateCurrentOverlay((o) => {
@@ -687,6 +712,8 @@ const AppTable = (props: ITableData<any>) => {
               });
             })
             .flat()}
+
+            <div  className={styles.today}></div>
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ export interface Cell {
   column: number;
   row: number;
   header: boolean;
+  date:Date
 }
 
 export interface TableData<D> {
