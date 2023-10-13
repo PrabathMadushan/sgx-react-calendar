@@ -6,9 +6,9 @@ interface CellProps {
   row: number;
   value: JSX.Element;
   type?: "header" | "text";
-  onMouseDown: (cell: Cell) => void;
-  onMouseUp: (cell: Cell) => void;
-  onMouseMove: (cell: Cell) => void;
+  onMouseDown?: (cell: Cell) => void;
+  onMouseUp?: (cell: Cell) => void;
+  onMouseMove?: (cell: Cell) => void;
   isDragging: boolean;
   mode: "Edit" | "View";
 }
@@ -25,7 +25,7 @@ const TableCell = (props: CellProps) => {
       onMouseDown={(e) => {
         if (props.mode === "Edit" && props.type === "text") {
           const isCtrPressed = e.ctrlKey;
-          if (!isCtrPressed) {
+          if (!isCtrPressed && props.onMouseDown) {
             props.onMouseDown({
               column: props.column,
               row: props.row,
@@ -37,7 +37,7 @@ const TableCell = (props: CellProps) => {
         }
       }}
       onMouseUp={() => {
-        if (props.mode === "Edit" && props.type === "text")
+        if (props.mode === "Edit" && props.type === "text"  && props.onMouseUp)
           props.onMouseUp({
             column: props.column,
             row: props.row,
@@ -47,7 +47,7 @@ const TableCell = (props: CellProps) => {
           });
       }}
       onMouseMove={() => {
-        if (props.mode === "Edit" && props.type === "text")
+        if (props.mode === "Edit" && props.type === "text" && props.onMouseMove)
           props.onMouseMove({
             column: props.column,
             row: props.row,

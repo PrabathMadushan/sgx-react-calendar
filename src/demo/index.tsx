@@ -1,4 +1,4 @@
-import AppTable from "../lib/table";
+import AppTable from "../lib/calender";
 import styles from "./index.module.scss";
 
 const Demo = () => {
