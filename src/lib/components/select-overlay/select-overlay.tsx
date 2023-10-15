@@ -18,7 +18,7 @@ interface SelectOverlayProps {
     creating: boolean;
     mode: "Edit" | "View";
     active:boolean;
-    setActive:(id:string)=>void;
+    onActive:(id:string)=>void;
     onMouseClick: (overlayId: string) => void;
     onDelete: (overlayId: string, columnIndex: number) => void;
     onResizeTopClick: (overlayId: string) => void;
@@ -29,23 +29,21 @@ const SelectOverlay = (props: SelectOverlayProps) => {
 
     return (
         <div
-            className={`${styles.selectOverlay} ${props.color}`}
+            className={`${styles.selectOverlay} ${props.active?props.color+"Active ":props.color}`}
             style={{
                 top: `${props.top}px`,
                 left: `${props.left}px`,
                 width: `${props.width}px`,
                 height: `${props.height}px`,
-                // display: `${props.width === 0 || props.height === 0 ? "none" : "flex"}`,
                 border: `solid 2px ${props.color}`,
-                // backgroundColor:props.active?"#2196f3":"inherit",
                 zIndex:props.active?10000:10,
                 opacity: props.removing ? 0 : 1,
 
             }}
             onMouseDown={(e)=>{
                     console.log("mouse enter")
-                    // e.stopPropagation()
-                    props.setActive(props.id)
+                    e.stopPropagation()
+                    props.onActive(props.id)
             }}
         >
             {/* {props.mode === "Edit" && (

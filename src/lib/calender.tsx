@@ -513,7 +513,7 @@ const AppTable = (props: ITableData<any>) => {
                     }
 
                     setCurrentAction("NONE");
-                    setActiveOverlayId("");
+                    // setActiveOverlayId("");
                 }}
             >
                 <div
@@ -745,12 +745,9 @@ const AppTable = (props: ITableData<any>) => {
                                         left={o.left + 1 + (o.indent * 10)}
                                         mode={props.mode}
                                         color={c.color}
-                                        active={o.active}
-                                        setActive={(id)=>{
-                                            updateOverlayById((x)=>{
-                                                return {...x,active:true}
-                                            },id,c.columnIndex)
-
+                                        active={o.id===activeOverlayId}
+                                        onActive={(id)=>{
+                                            setActiveOverlayId(id)
                                         }}
                                         removing={o.removing}
                                         creating={
