@@ -225,7 +225,9 @@ const AppTable = (props: ITableData<any>) => {
             }
         }
         setCells(cells);
-        setOverlays(overlayCols);
+        setOverlays((ps)=>{
+            return [...ps,...overlayCols]
+        });
     }, [props.data, week]);
 
     const updateCurrentOverlay = (
@@ -561,6 +563,7 @@ const AppTable = (props: ITableData<any>) => {
                                     setOverlays((ps) => {
                                         const [os] = ps.filter(
                                             (o) => o.columnIndex === _column
+                                            && o.weekNo === weekNumber
                                         );
 
                                         if (os) {
@@ -729,6 +732,7 @@ const AppTable = (props: ITableData<any>) => {
                         />
                     ))}
                     {overlays
+                        .filter(o=>o.weekNo===weekNumber)
                         .map((c) => {
                             return c.overlayPositions.map((o) => {
                                 return (
