@@ -1,12 +1,5 @@
-import moment from "moment";
-import {BsArrowsMove} from "react-icons/bs";
-import {RiCloseFill} from "react-icons/ri";
-import {INTERVAL} from "../../calender";
-import {DEFAULT_CELL_HEIGHT, DEFAULT_CELL_WIDTH} from "../cell/cell";
 import "./colors.scss";
 import styles from "./select-overlay.module.scss";
-import {useState} from "react";
-
 interface SelectOverlayProps {
     id: string;
     top: number;
