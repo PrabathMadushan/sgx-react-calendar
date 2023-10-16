@@ -681,10 +681,6 @@ const AppTable = (props: ITableData<any>) => {
                             }
                                 break;
                         }
-
-                        if (currentAction === "CREATING") {
-
-                        }
                     }}
                     onMouseUp={(e) => {
                         const _x = e.pageX - e.currentTarget.getBoundingClientRect().x;
