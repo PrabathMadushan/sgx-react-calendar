@@ -669,7 +669,7 @@ const AppTable = (props: ITableData<any>) => {
                                 // ele.animate({ scrollLeft: 25 }, 300);
                             }
                                 break;
-                            default: {
+                            case "CREATING":
                                 updateCurrentOverlay((o) => {
                                     const a = (getRowByY(_y) - o.center.row) * DEFAULT_CELL_HEIGHT;
                                     return {
@@ -678,7 +678,7 @@ const AppTable = (props: ITableData<any>) => {
                                         height: Math.abs(a) + DEFAULT_CELL_HEIGHT, //new
                                     };
                                 }, getColumnByX(_x));
-                            }
+
                                 break;
                         }
                     }}

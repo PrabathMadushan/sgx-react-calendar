@@ -112,13 +112,14 @@ const SelectOverlay = (props: SelectOverlayProps) => {
                     this is title
                 </div>
             </div>
-            {props.active &&   <div className={styles.modal} style={{
+            {props.active && <div className={styles.modal} style={{
                 top: `${props.top}px`,
-                left: `${props.left-410}px`,
+                left: `${props.left - 400 + 5 <= 0 ? props.left + props.width + 5 : props.left - 400 - 5}px`,
                 zIndex: props.active ? 10000 : 10,
             }}>
                 <h3>this is title</h3>
-                <div>from:{props.top/DEFAULT_CELL_HEIGHT-1} | to:{(props.top+props.height) / DEFAULT_CELL_HEIGHT - 1}</div>
+                <div>from:{props.top / DEFAULT_CELL_HEIGHT - 1} |
+                    to:{(props.top + props.height) / DEFAULT_CELL_HEIGHT - 1}</div>
             </div>}
 
         </div>
