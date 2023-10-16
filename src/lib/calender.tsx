@@ -35,7 +35,7 @@ interface OverlayPosition {
     top: number;
     left: number;
     indent: number;
-    active:boolean;
+    active: boolean;
     center: Cell;
     color: string;
     removing: boolean;
@@ -105,8 +105,8 @@ const AppTable = (props: ITableData<any>) => {
                     if (op.top + op.height > o.overlayPositions[index + 1].top) {
                         currentIndent++;
                         o.overlayPositions[index + 1].indent = currentIndent;
-                    }else{
-                        currentIndent=0
+                    } else {
+                        currentIndent = 0
                         o.overlayPositions[index + 1].indent = currentIndent;
                     }
                 }
@@ -170,7 +170,7 @@ const AppTable = (props: ITableData<any>) => {
                         top: (r.from / 15 + 1) * DEFAULT_CELL_HEIGHT,
                         left: (cIndex + 1) * DEFAULT_CELL_WIDTH,
                         removing: false,
-                        active:false,
+                        active: false,
                         indent: 0,
                         center: {
                             column: cIndex,
@@ -225,8 +225,8 @@ const AppTable = (props: ITableData<any>) => {
             }
         }
         setCells(cells);
-        setOverlays((ps)=>{
-            return [...ps,...overlayCols]
+        setOverlays((ps) => {
+            return [...ps, ...overlayCols]
         });
     }, [props.data, week]);
 
@@ -563,7 +563,7 @@ const AppTable = (props: ITableData<any>) => {
                                     setOverlays((ps) => {
                                         const [os] = ps.filter(
                                             (o) => o.columnIndex === _column
-                                            && o.weekNo === weekNumber
+                                                && o.weekNo === weekNumber
                                         );
 
                                         if (os) {
@@ -580,7 +580,7 @@ const AppTable = (props: ITableData<any>) => {
                                                 left: getColumnByX(_x) * DEFAULT_CELL_WIDTH,
                                                 height: DEFAULT_CELL_HEIGHT, //new
                                                 width: DEFAULT_CELL_WIDTH,
-                                                active:false,
+                                                active: false,
                                                 indent: 0,
                                                 center: {
                                                     column: _column,
@@ -668,9 +668,8 @@ const AppTable = (props: ITableData<any>) => {
 
                                 // ele.animate({ scrollLeft: 25 }, 300);
                             }
-
                                 break;
-                            case "CREATING": {
+                            default: {
                                 updateCurrentOverlay((o) => {
                                     const a = (getRowByY(_y) - o.center.row) * DEFAULT_CELL_HEIGHT;
                                     return {
@@ -679,20 +678,7 @@ const AppTable = (props: ITableData<any>) => {
                                         height: Math.abs(a) + DEFAULT_CELL_HEIGHT, //new
                                     };
                                 }, getColumnByX(_x));
-                                // if (currentAction === "CREATING") {
-                                //     updateCurrentOverlay((o) => {
-                                //         const a = (cell.row - o.center.row) * DEFAULT_CELL_HEIGHT;
-                                //         return {
-                                //             ...o,
-                                //             top: a <= 0 ? cell.row * DEFAULT_CELL_HEIGHT : o.top,
-                                //             height: Math.abs(a) + DEFAULT_CELL_HEIGHT, //new
-                                //         };
-                                //     }, cell.column);
-                                // }
                             }
-
-                                break;
-                            default:
                                 break;
                         }
 
@@ -732,7 +718,7 @@ const AppTable = (props: ITableData<any>) => {
                         />
                     ))}
                     {overlays
-                        .filter(o=>o.weekNo===weekNumber)
+                        .filter(o => o.weekNo === weekNumber)
                         .map((c) => {
                             return c.overlayPositions.map((o) => {
                                 return (
@@ -745,8 +731,8 @@ const AppTable = (props: ITableData<any>) => {
                                         left={o.left + 1 + (o.indent * 10)}
                                         mode={props.mode}
                                         color={c.color}
-                                        active={o.id===activeOverlayId}
-                                        onActive={(id)=>{
+                                        active={o.id === activeOverlayId}
+                                        onActive={(id) => {
                                             setActiveOverlayId(id)
                                         }}
                                         removing={o.removing}
