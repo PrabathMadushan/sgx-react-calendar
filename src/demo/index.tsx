@@ -14,8 +14,9 @@ const Demo = () => {
                     }
                 }]
             }],
-            createModalTemplate: (event,deleteRange,updateEvent) => {
+            createModalTemplate: (event,deleteEvent,updateEvent) => {
                 return <div>
+                    <button onClick={deleteEvent}>Delete</button>
                     <h3>{event.title}</h3>
 
                     kamal
@@ -23,6 +24,12 @@ const Demo = () => {
             },
             editModalTemplate: (event,deleteRange,updateEvent) => {
                 return <div></div>
+            },
+            eventContentTemplate:(event)=>{
+                return <div>
+                    {event.title} <br/>
+                    {event.startTime}:{event.endTime}
+                </div>
             }
 
         }

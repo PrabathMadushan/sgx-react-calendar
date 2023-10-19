@@ -1,6 +1,6 @@
 import "./colors.scss";
 import styles from "./select-overlay.module.scss";
-import {DEFAULT_CELL_HEIGHT} from "../cell/cell";
+import {DEFAULT_CELL_HEIGHT, DEFAULT_CELL_WIDTH} from "../cell/cell";
 import {CalenderEventValue} from "../../models";
 
 interface SelectOverlayProps<T> {
@@ -17,12 +17,13 @@ interface SelectOverlayProps<T> {
     mode: "Edit" | "View";
     active: boolean;
     onActive: (id: string) => void;
-    onMouseClick: (overlayId: string) => void;
+    onMoveClick: (overlayId: string) => void;
     onDelete: (overlayId: string, columnIndex: number) => void;
     onResizeTopClick: (overlayId: string) => void;
     onResizeBottomClick: (overlayId: string) => void;
     createModalTemplate: (event: CalenderEventValue<T>, deleteEvent: () => void, updateEvent: (event: CalenderEventValue<T>) => void) => JSX.Element;
     editModalTemplate: (event: CalenderEventValue<T>, deleteEvent: () => void, updateEvent: (event: CalenderEventValue<T>) => void) => JSX.Element;
+    eventContentTemplate:(event:CalenderEventValue<T>) => JSX.Element;
 }
 
 const SelectOverlay = <T, >(props: SelectOverlayProps<T>) => {
@@ -46,6 +47,7 @@ const SelectOverlay = <T, >(props: SelectOverlayProps<T>) => {
                     console.log("mouse enter")
                     e.stopPropagation()
                     props.onActive(props.id)
+                    props.onMoveClick(props.id)
                 }}
             >
 
@@ -61,7 +63,7 @@ const SelectOverlay = <T, >(props: SelectOverlayProps<T>) => {
                         userSelect: "none",
                     }}
                 >
-                    {props.title}
+                    {props.eventContentTemplate(props.event)}
                 </div>
             </div>
             {props.active && <div onMouseDown={(e)=>e.stopPropagation()} className={styles.modal} style={{
@@ -70,7 +72,8 @@ const SelectOverlay = <T, >(props: SelectOverlayProps<T>) => {
                 zIndex: props.active ? 10000 : 10,
             }}>
                 {props.createModalTemplate(props.event, () => {
-
+                    console.log("deleting")
+                    props.onDelete(props.id, Math.trunc(props.left / DEFAULT_CELL_WIDTH))
                 }, (event) => {
 
                 })}

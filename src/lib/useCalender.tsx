@@ -22,6 +22,7 @@ interface IOptions<T> {
     data: CalendarColumn<T>[];
     createModalTemplate: (event:CalenderEventValue<T>,deleteEvent: () => void,updateEvent: (event:CalenderEventValue<T>) => void) => JSX.Element;
     editModalTemplate: (event:CalenderEventValue<T>,deleteEvent: () => void,updateEvent: (event:CalenderEventValue<T>) => void) => JSX.Element;
+    eventContentTemplate:(event:CalenderEventValue<T>) => JSX.Element;
 }
 
 
@@ -234,6 +235,7 @@ const useCalender = <T,>(props: IOptions<T>) => {
         return overlay;
     };
     const removeOverlayById = (id: string, columnIndex: number) => {
+        console.log(id,columnIndex)
         updateOverlayById((o) => ({...o, removing: true}), id, columnIndex);
         setTimeout(() => {
             setOverlays((ps) => {
@@ -259,52 +261,9 @@ const useCalender = <T,>(props: IOptions<T>) => {
 
     const validateMoveTop = (o: OverlayPosition<T>, newTop: number) => {
         let validatedTop = newTop;
-
         if (DEFAULT_CELL_HEIGHT > newTop) {
             validatedTop = DEFAULT_CELL_HEIGHT;
-        } else {
-            const [column] = overlays.filter(
-                (ov) => ov.columnIndex === o.left / DEFAULT_CELL_WIDTH
-            );
-            if (column) {
-                const sOverlays =
-                    [...column.overlayPositions].sort((a, b) => a.top - b.top) || [];
-                if (sOverlays.length > 1) {
-                    const thisIndex = sOverlays.findIndex((s) => s.id === o.id);
-                    const topIndex = thisIndex - 1;
-                    const bottomIndex = thisIndex + 1;
-
-                    if (topIndex !== -1) {
-                        const top = sOverlays[topIndex];
-                        const minTop = top.top + top.height;
-                        if (newTop < minTop) {
-                            validatedTop = minTop;
-                        }
-                    } else {
-                        if (DEFAULT_CELL_HEIGHT > newTop) {
-                            validatedTop = DEFAULT_CELL_HEIGHT;
-                        }
-                    }
-
-                    if (bottomIndex < sOverlays.length) {
-                        const bottom = sOverlays[bottomIndex];
-                        const maxTop = bottom.top - o.height;
-                        if (newTop > maxTop) {
-                            validatedTop = maxTop;
-                        }
-                    } else {
-                        if (
-                            (TOTAL_MINUTES_FOR_DAY / INTERVAL + 1) * DEFAULT_CELL_HEIGHT <=
-                            newTop + o.height
-                        ) {
-                            validatedTop =
-                                Math.round(o.top / DEFAULT_CELL_HEIGHT) * DEFAULT_CELL_HEIGHT;
-                        }
-                    }
-                }
-            }
         }
-
         return validatedTop;
     };
     const validateResizeTop = (
@@ -644,6 +603,7 @@ const useCalender = <T,>(props: IOptions<T>) => {
                                     <SelectOverlay
                                         createModalTemplate={props.createModalTemplate}
                                         editModalTemplate={props.editModalTemplate}
+                                        eventContentTemplate={props.eventContentTemplate}
                                         event={{
                                             startTime:o.top,
                                             endTime:o.top+o.height,
@@ -669,8 +629,9 @@ const useCalender = <T,>(props: IOptions<T>) => {
                                         creating={
                                             currentAction === "CREATING" && currentOverlayId === o.id
                                         }
-                                        onMouseClick={(id) => {
+                                        onMoveClick={(id) => {
                                             setActiveOverlayId(id);
+                                            setCurrentOverlayId(id)
                                             setCurrentAction("MOVING");
                                         }}
                                         onDelete={(id, columnIndex) => {
@@ -698,7 +659,9 @@ const useCalender = <T,>(props: IOptions<T>) => {
                         })
                         .flat()}
 
-                    <div style={todayTimeLocation} className={styles.today}></div>
+                    <div style={todayTimeLocation} className={styles.today}>
+
+                    </div>
                 </div>
             </div>
         </div>
