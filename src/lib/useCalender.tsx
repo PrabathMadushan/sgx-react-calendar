@@ -1,67 +1,37 @@
-import moment from "moment";
-import {useEffect, useMemo, useState} from "react";
-import {FiClock} from "react-icons/fi";
+import React, {useEffect, useMemo, useState} from "react";
+import {
+    CalendarColumn, CalenderEventValue,
+    Cell,
+    colors,
+    INTERVAL,
+    OverlayColumn,
+    OverlayPosition,
+    TOTAL_MINUTES_FOR_DAY
+} from "./models";
+import moment from "moment/moment";
 import {v4 as uuid} from "uuid";
-import TableCell, {
-    DEFAULT_CELL_HEIGHT,
-    DEFAULT_CELL_WIDTH,
-} from "./components/cell/cell";
-import SelectOverlay from "./components/select-overlay/select-overlay";
-import {Cell, TableColumn} from "./models";
+import TableCell, {DEFAULT_CELL_HEIGHT, DEFAULT_CELL_WIDTH} from "./components/cell/cell";
+import {FiClock} from "react-icons/fi";
 import styles from "./calendar.module.scss";
 import DatePicker from "./components/toolbar/date-picker/date-picker";
 import Navigation from "./components/toolbar/navigation/navigation";
+import SelectOverlay from "./components/select-overlay/select-overlay";
 
-interface ITableData<D> {
-    data: TableColumn<D>[];
-    mode: "Edit" | "View";
-    onChange: (data: TableColumn<D>[]) => void;
+
+interface IOptions<T> {
+    data: CalendarColumn<T>[];
+    createModalTemplate: (event:CalenderEventValue<T>,deleteEvent: () => void,updateEvent: (event:CalenderEventValue<T>) => void) => JSX.Element;
+    editModalTemplate: (event:CalenderEventValue<T>,deleteEvent: () => void,updateEvent: (event:CalenderEventValue<T>) => void) => JSX.Element;
 }
 
-interface OverlayCol {
-    columnId: string;
-    columnIndex: number;
-    color: string;
-    title: string;
-    overlayPositions: OverlayPosition[];
-    weekNo: number;
-    date: Date;
-}
 
-interface OverlayPosition {
-    id: string;
-    width: number;
-    height: number;
-    top: number;
-    left: number;
-    indent: number;
-    active: boolean;
-    center: Cell;
-    color: string;
-    removing: boolean;
-}
-
-const colors = [
-    "color01",
-    "color02",
-    "color03",
-    "color04",
-    "color05",
-    "color06",
-    "color07",
-    "color08",
-    "color09",
-    "color10",
-];
-
-export const TOTAL_MINUTES_FOR_DAY = 60 * 24;
-export const INTERVAL = 15;
-
-const AppTable = (props: ITableData<any>) => {
+const useCalender = <T,>(props: IOptions<T>) => {
+    const [events, setEvents] = useState<CalendarColumn<T>[]>([])
     const [cells, setCells] = useState<Cell[]>([]);
-    const [overlays, setOverlays] = useState<OverlayCol[]>([]);
+    const [overlays, setOverlays] = useState<OverlayColumn<T>[]>([]);
+    const [currentOverlayId, setCurrentOverlayId] = useState("");
     const [activeOverlayId, setActiveOverlayId] = useState("");
-    const [startingOverlay, setStartingOverlay] = useState<OverlayPosition>();
+    const [startingOverlay, setStartingOverlay] = useState<OverlayPosition<T>>();
     const [week, setWeek] = useState<Date[]>([]);
     const [weekNumber, setWeekNumber] = useState(0);
     // const { dates } = useCalenderFunctions();
@@ -69,6 +39,7 @@ const AppTable = (props: ITableData<any>) => {
         left: 0,
         top: 0,
     })
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setInterval(() => {
@@ -96,7 +67,7 @@ const AppTable = (props: ITableData<any>) => {
     }, [weekNumber]);
 
     const pack = () => {
-        const ols = [] as OverlayCol[]
+        const ols = [] as OverlayColumn<T>[]
         overlays.forEach((o) => {
             o.overlayPositions.sort((a, b) => a.top - b.top);
             let currentIndent: number = 0
@@ -130,13 +101,13 @@ const AppTable = (props: ITableData<any>) => {
         x: 0,
     });
 
+
+    //Add cells and overlay-columns
     useEffect(() => {
-        const columns = props.data;
         const cells: Cell[] = [];
-        const overlayCols: OverlayCol[] = [];
+        const columns:OverlayColumn<T>[] = []
         const maxRowCount = TOTAL_MINUTES_FOR_DAY / INTERVAL;
         const maxColCount = 7;
-
         for (let cIndex = 0; cIndex < maxColCount; cIndex++) {
             cells.push({
                 value: (
@@ -150,40 +121,19 @@ const AppTable = (props: ITableData<any>) => {
                 date: week[cIndex],
                 row: 0,
             });
-
             const oColor = colors[cIndex % colors.length];
-            overlayCols.push({
-                columnId: props.data[cIndex].id,
+            columns.push({
+                columnId: "id:" + uuid(),
                 color: oColor,
-                title: moment(props.data[cIndex].date).format("dddd"),
+                title: moment(week[cIndex]).format("dddd"),
                 columnIndex: cIndex + 1,
-                date: props.data[cIndex].date,
+                date: week[cIndex],
 
                 weekNo: Math.round(
                     moment().clone().startOf("isoWeek").diff(week[cIndex], "weeks")
                 ),
-                overlayPositions: columns[cIndex].timeSlots.map((r) => {
-                    return {
-                        id: uuid(),
-                        width: DEFAULT_CELL_WIDTH,
-                        height: (r.to / 15 - r.from / 15) * DEFAULT_CELL_HEIGHT,
-                        top: (r.from / 15 + 1) * DEFAULT_CELL_HEIGHT,
-                        left: (cIndex + 1) * DEFAULT_CELL_WIDTH,
-                        removing: false,
-                        active: false,
-                        indent: 0,
-                        center: {
-                            column: cIndex,
-                            row: r.from,
-                            value: <></>,
-                            header: false,
-                            date: props.data[cIndex].date,
-                        },
-                        color: oColor,
-                    };
-                }),
+                overlayPositions:[],
             });
-
             for (let rowIndex = 0; rowIndex < maxRowCount; rowIndex++) {
                 if (cIndex === 0) {
                     cells.push({
@@ -198,13 +148,13 @@ const AppTable = (props: ITableData<any>) => {
                         ),
                         column: cIndex,
                         header: false,
-                        date: props.data[cIndex].date,
+                        date: week[cIndex],
                         row: rowIndex + 1,
                     });
                     if (rowIndex === 0) {
                         cells.push({
                             header: false,
-                            date: props.data[cIndex].date,
+                            date: week[cIndex],
                             value: (
                                 <>
                                     <FiClock style={{fontSize: 22, color: "#6F757E"}}/>
@@ -219,26 +169,27 @@ const AppTable = (props: ITableData<any>) => {
                     header: false,
                     value: <></>,
                     column: cIndex + 1,
-                    date: props.data[cIndex].date,
+                    date: week[cIndex],
                     row: rowIndex + 1,
                 });
             }
         }
         setCells(cells);
-        setOverlays((ps) => {
-            return [...ps, ...overlayCols]
-        });
-    }, [props.data, week]);
+        setOverlays(ps=>{
+            return [...ps,...columns]
+        })
+    }, [week]);
+
 
     const updateCurrentOverlay = (
-        callback: (overlay: OverlayPosition) => OverlayPosition,
+        callback: (overlay: OverlayPosition<T>) => OverlayPosition<T>,
         columnIndex?: number
     ) => {
-        updateOverlayById(callback, activeOverlayId, columnIndex);
+        updateOverlayById(callback, currentOverlayId, columnIndex);
     };
 
     const updateOverlayById = (
-        callback: (overlay: OverlayPosition) => OverlayPosition,
+        callback: (overlay: OverlayPosition<T>) => OverlayPosition<T>,
         id: string,
         columnIndex?: number
     ) => {
@@ -303,28 +254,10 @@ const AppTable = (props: ITableData<any>) => {
     };
 
     const onUpdate = () => {
-        const x = overlays.map((o) => {
-            return {
-                id: o.columnId,
-                date: new Date(),
-                timeSlots: o.overlayPositions.map((p) => {
-                    return {
-                        from: (p.top / DEFAULT_CELL_HEIGHT - 1) * 15,
-                        to:
-                            (p.top / DEFAULT_CELL_HEIGHT - 1) * 15 +
-                            (p.height / DEFAULT_CELL_HEIGHT) * 15,
-                        data: {} as any,
-                        description: "string",
-                        title: o.title,
-                    };
-                }),
-            };
-        });
-        props.onChange(x);
         pack();
     };
 
-    const validateMoveTop = (o: OverlayPosition, newTop: number) => {
+    const validateMoveTop = (o: OverlayPosition<T>, newTop: number) => {
         let validatedTop = newTop;
 
         if (DEFAULT_CELL_HEIGHT > newTop) {
@@ -375,7 +308,7 @@ const AppTable = (props: ITableData<any>) => {
         return validatedTop;
     };
     const validateResizeTop = (
-        o: OverlayPosition,
+        o: OverlayPosition<T>,
         newTop: number,
         newHeight: number
     ) => {
@@ -418,7 +351,7 @@ const AppTable = (props: ITableData<any>) => {
 
         return {validatedTop, validatedHeight};
     };
-    const validateResizeBottom = (o: OverlayPosition, newHeight: number) => {
+    const validateResizeBottom = (o: OverlayPosition<T>, newHeight: number) => {
         let validatedHeight = newHeight;
 
         if (newHeight <= DEFAULT_CELL_HEIGHT) {
@@ -485,7 +418,7 @@ const AppTable = (props: ITableData<any>) => {
         return Math.trunc(y / DEFAULT_CELL_HEIGHT);
     }
 
-    return (
+    const calender = (
         <div>
             <div>
                 <div className={styles.toolbar}>
@@ -551,13 +484,6 @@ const AppTable = (props: ITableData<any>) => {
                                     (o) => o.columnIndex === _column
                                 );
                                 if (column) {
-                                    // const x = column.overlayPositions.filter(
-                                    //     (o) =>
-                                    //         o.top + o.height > _row * DEFAULT_CELL_HEIGHT &&
-                                    //         o.top <= _row * DEFAULT_CELL_HEIGHT
-                                    // );
-
-                                    // if (true) {
                                     const id = uuid();
                                     setCurrentAction("CREATING");
                                     setOverlays((ps) => {
@@ -567,20 +493,16 @@ const AppTable = (props: ITableData<any>) => {
                                         );
 
                                         if (os) {
-                                            console.log("center:", {
-                                                column: _column,
-                                                row: _row,
-                                                value: <></>,
-                                                date: new Date(),
-                                                header: false
-                                            })
+
                                             os.overlayPositions.push({
                                                 id: id,
                                                 top: getRowByY(_y) * DEFAULT_CELL_HEIGHT,
                                                 left: getColumnByX(_x) * DEFAULT_CELL_WIDTH,
                                                 height: DEFAULT_CELL_HEIGHT, //new
                                                 width: DEFAULT_CELL_WIDTH,
+                                                title:"this is title",
                                                 active: false,
+                                                description:"",
                                                 indent: 0,
                                                 center: {
                                                     column: _column,
@@ -598,8 +520,7 @@ const AppTable = (props: ITableData<any>) => {
 
                                         return [...ps];
                                     });
-                                    setActiveOverlayId(id);
-                                    // }
+                                    setCurrentOverlayId(id);
                                 }
                             }
                         }
@@ -696,7 +617,9 @@ const AppTable = (props: ITableData<any>) => {
                                     height: Math.abs(a) + DEFAULT_CELL_HEIGHT,
                                 };
                             }, _column);
-                            setActiveOverlayId("");
+                            setActiveOverlayId(currentOverlayId)
+                            setCurrentOverlayId("");
+
                             onUpdate();
                         }
                         // setCurrentAction("NONE");
@@ -710,7 +633,7 @@ const AppTable = (props: ITableData<any>) => {
                             column={cell.column}
                             row={cell.row}
                             isDragging={currentAction === "CREATING"}
-                            mode={props.mode}
+                            mode={"Edit"}
                         />
                     ))}
                     {overlays
@@ -719,13 +642,24 @@ const AppTable = (props: ITableData<any>) => {
                             return c.overlayPositions.map((o) => {
                                 return (
                                     <SelectOverlay
+                                        createModalTemplate={props.createModalTemplate}
+                                        editModalTemplate={props.editModalTemplate}
+                                        event={{
+                                            startTime:o.top,
+                                            endTime:o.top+o.height,
+                                            description:o.description,
+                                            title:o.title,
+                                            repetition:"",
+                                            data:o.data
+                                        }}
                                         key={o.id}
                                         id={o.id}
                                         height={o.height}
                                         width={o.width - 2 - (o.indent * 12)}
+                                        title={o.title}
                                         top={o.top}
                                         left={o.left + 1 + (o.indent * 10)}
-                                        mode={props.mode}
+                                        mode={"Edit"}
                                         color={c.color}
                                         active={o.id === activeOverlayId}
                                         onActive={(id) => {
@@ -733,7 +667,7 @@ const AppTable = (props: ITableData<any>) => {
                                         }}
                                         removing={o.removing}
                                         creating={
-                                            currentAction === "CREATING" && activeOverlayId === o.id
+                                            currentAction === "CREATING" && currentOverlayId === o.id
                                         }
                                         onMouseClick={(id) => {
                                             setActiveOverlayId(id);
@@ -745,7 +679,7 @@ const AppTable = (props: ITableData<any>) => {
                                         onResizeTopClick={(id) => {
                                             const overlay = getOverlayById(id);
                                             if (overlay) {
-                                                setActiveOverlayId(id);
+                                                setCurrentOverlayId(id);
                                                 setCurrentAction("RESIZING_TOP");
                                                 setStartingOverlay(overlay);
                                             }
@@ -753,7 +687,7 @@ const AppTable = (props: ITableData<any>) => {
                                         onResizeBottomClick={(id) => {
                                             const overlay = getOverlayById(id);
                                             if (overlay) {
-                                                setActiveOverlayId(id);
+                                                setCurrentOverlayId(id);
                                                 setCurrentAction("RESIZING_BOTTOM");
                                                 setStartingOverlay(overlay);
                                             }
@@ -769,6 +703,22 @@ const AppTable = (props: ITableData<any>) => {
             </div>
         </div>
     );
-};
 
-export default AppTable;
+    const loadData = (data: any) => {
+
+    }
+
+    const data = useMemo(() => {
+        return null;
+    }, [])
+
+    const addRange = (date: string): string => {
+        return "GEN_ID"
+    }
+
+
+    return {calender, loadData, events}
+
+}
+
+export default useCalender;

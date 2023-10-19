@@ -1,13 +1,16 @@
 import "./colors.scss";
 import styles from "./select-overlay.module.scss";
 import {DEFAULT_CELL_HEIGHT} from "../cell/cell";
+import {CalenderEventValue} from "../../models";
 
-interface SelectOverlayProps {
+interface SelectOverlayProps<T> {
     id: string;
     top: number;
     left: number;
     width: number;
     height: number;
+    event: CalenderEventValue<T>
+    title: string;
     color: string;
     removing: boolean;
     creating: boolean;
@@ -18,9 +21,11 @@ interface SelectOverlayProps {
     onDelete: (overlayId: string, columnIndex: number) => void;
     onResizeTopClick: (overlayId: string) => void;
     onResizeBottomClick: (overlayId: string) => void;
+    createModalTemplate: (event: CalenderEventValue<T>, deleteEvent: () => void, updateEvent: (event: CalenderEventValue<T>) => void) => JSX.Element;
+    editModalTemplate: (event: CalenderEventValue<T>, deleteEvent: () => void, updateEvent: (event: CalenderEventValue<T>) => void) => JSX.Element;
 }
 
-const SelectOverlay = (props: SelectOverlayProps) => {
+const SelectOverlay = <T, >(props: SelectOverlayProps<T>) => {
 
     return (
         <div className={styles.overlayContainer}>
@@ -43,43 +48,7 @@ const SelectOverlay = (props: SelectOverlayProps) => {
                     props.onActive(props.id)
                 }}
             >
-                {/* {props.mode === "Edit" && (
-        <div
-          className={`${styles.btnClose} ${props.color}b`}
-          onClick={() => {
-            if (props.mode === "Edit")
-              props.onDelete(props.id, props.left / DEFAULT_CELL_WIDTH);
-          }}
-        >
-          <RiCloseFill />
-        </div>
-      )} */}
-                {/* {props.mode === "Edit" && (
-        <div
-          className={`${styles.resizeTop} ${props.color}b`}
-          onMouseDown={() => {
-            if (props.mode === "Edit") props.onResizeTopClick(props.id);
-          }}
-        ></div>
-      )}
-      {props.mode === "Edit" && (
-        <div
-          className={`${styles.resizeBottom} ${props.color}b`}
-          onMouseDown={() => {
-            if (props.mode === "Edit") props.onResizeBottomClick(props.id);
-          }}
-        ></div>
-      )}
-      {props.mode === "Edit" && !props.creating && (
-        <div
-          className={styles.move}
-          onMouseDown={() => {
-            if (props.mode === "Edit") props.onMoveClick(props.id);
-          }}
-        >
-          <BsArrowsMove />
-        </div>
-      )} */}
+
                 <div
                     onDragStart={() => {
                         return false;
@@ -92,34 +61,20 @@ const SelectOverlay = (props: SelectOverlayProps) => {
                         userSelect: "none",
                     }}
                 >
-                    {/* {moment
-          .utc()
-          .startOf("day")
-          .add((props.top / DEFAULT_CELL_HEIGHT - 1) * INTERVAL, "minutes")
-          .format("HH:mm")}
-        -{" "}
-        {moment
-          .utc()
-          .startOf("day")
-          .add(
-            (props.height / DEFAULT_CELL_HEIGHT -
-              1 +
-              props.top / DEFAULT_CELL_HEIGHT) *
-              INTERVAL,
-            "minutes"
-          )
-          .format("HH:mm")} */}
-                    this is title
+                    {props.title}
                 </div>
             </div>
-            {props.active && <div className={styles.modal} style={{
+            {props.active && <div onMouseDown={(e)=>e.stopPropagation()} className={styles.modal} style={{
                 top: `${props.top}px`,
                 left: `${props.left - 400 + 5 <= 0 ? props.left + props.width + 5 : props.left - 400 - 5}px`,
                 zIndex: props.active ? 10000 : 10,
             }}>
-                <h3>this is title</h3>
-                <div>from:{props.top / DEFAULT_CELL_HEIGHT - 1} |
-                    to:{(props.top + props.height) / DEFAULT_CELL_HEIGHT - 1}</div>
+                {props.createModalTemplate(props.event, () => {
+
+                }, (event) => {
+
+                })}
+
             </div>}
 
         </div>
